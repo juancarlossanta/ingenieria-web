@@ -1,95 +1,134 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useQuery, gql, useMutation } from "@apollo/client";
+
+const FIND_ALL_AIRCRAFT = gql`
+  query {
+    findAllAircraft {
+      aircraftId
+      aircraftType
+      maxSeatCapacity
+      seatLayout
+    }
+  }
+`;
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { loading, error, data, refetch } = useQuery(FIND_ALL_AIRCRAFT);
+  // const [newThis, { data, loading, error }]= useMutation(NEW_THIS);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  if (loading) {
+    return "loading...";
+  }
+
+  if (data.length === 0) {
+    return "No books available.";
+  }
+
+  if (data) {
+    console.log("data =: ", data.findAllAircraft);
+  }
+
+  return (
+    <>
+      <header>
+        <h1>Gestión de aviones y vuelos</h1>
+      </header>
+
+      <main>
+        {/* Section for airplanes */}
+        <section className="crud-section">
+          <h2>Gestión de aviones</h2>
+          <form className="crud-form" id="avion-form">
+            <input
+              type="text"
+              id="avion-tipo"
+              placeholder="Tipo Avión"
+              required
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+            <input
+              type="text"
+              id="avion-capacidad"
+              placeholder="Cantidad máxima de asientos"
+              required
+            />
+            <input
+              type="text"
+              id="avion-distribucion"
+              placeholder="Distribución de asientos"
+              required
+            />
+            <button type="submit" className="btn">
+              Agregar avión
+            </button>
+          </form>
+
+          <table className="crud-table">
+            <thead>
+              <tr>
+                <th>Id Aeronave</th>
+                <th>Tipo Avión</th>
+                <th>Cantidad máx. de asientos</th>
+                <th>Distribución de asientos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Airplanes will be displayed here */}
+              {data.findAllAircraft.map((film) => (
+                <tr key={film.id}>
+                  <td>{film.id.slice(-4, -1)}</td>
+                  <td>{film.title}</td>
+                  <td>{film.id.slice(-4, -1)}</td>
+                  <td>{film.title}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+
+        {/* Section for flights */}
+        <section className="crud-section">
+          <h2>Gestión de vuelos</h2>
+          <form className="crud-form" id="vuelo-form">
+            <input
+              type="text"
+              id="vuelo-destino"
+              placeholder="Destino del vuelo"
+              required
+            />
+            <button type="submit" className="btn">
+              Agregar vuelo
+            </button>
+          </form>
+
+          <table className="crud-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Destino</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Flights will be displayed here  */}
+              {data.allFilms.films.map((film) => (
+                <tr key={film.id}>
+                  <td>{film.id.slice(-4, -1)}</td>
+                  <td>{film.title}</td>
+                  <td>
+                    <button className="btn">Editar</button>
+                    <button className="btn delete">Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer>
+        <p>&copy; By Ingeniería Web Team</p>
       </footer>
-    </div>
+    </>
   );
 }
