@@ -15,14 +15,13 @@ const FIND_ALL_AIRCRAFT = gql`
 
 export default function Home() {
   const { loading, error, data, refetch } = useQuery(FIND_ALL_AIRCRAFT);
-  // const [newThis, { data, loading, error }]= useMutation(NEW_THIS);
 
   if (loading) {
     return "loading...";
   }
 
   if (data.length === 0) {
-    return "No books available.";
+    return "No aircraft available.";
   }
 
   if (data) {
